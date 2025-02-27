@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>选择游戏模式</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <h1>选择游戏模式</h1>
+    <p>欢迎，{{ username }}（{{ classname }}）！</p>
+    <div>
+        <a href="{{ url_for('quiz', username=username, classname=classname) }}">
+            <button>默写模式</button>
+        </a>
+        <a href="{{ url_for('fill_blanks', username=username, classname=classname) }}">
+            <button>选字填空模式</button>
+        </a>
+    </div>
+</body>
+</html>

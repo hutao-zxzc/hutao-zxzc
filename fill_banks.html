@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>选字填空</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <h1>选字填空</h1>
+    <div id="questions">
+        {% for question in questions %}
+        <div class="question">
+            <h2>{{ question.question }}</h2>
+            <div class="options">
+                {% for option in question.options %}
+                <button onclick="selectAnswer({{ loop.index0 }}, '{{ option }}')">{{ option }}</button>
+                {% endfor %}
+            </div>
+            <p>你的答案：<span id="answer_{{ loop.index0 }}"></span></p>
+        </div>
+        {% endfor %}
+    </div>
+    <button onclick="submitAnswers()">提交答案</button>
+    <div id="result"></div>
+    <script>
+        const answers = {};
+
+        function selectAnswer(questionIndex, option) {
+            answers[questionIndex] = option;
+            document.getElementById(`answer_${questionIndex}`).textContent = option;
+        }
+
+        function submitAnswers() {
+            fetch('/submit_fill_blanks', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    answers: answers,
+                    username: '{{ username }}',
+                    classname: '{{ classname }}'
+                }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                const resultDiv = document.getElementById('result');
+                resultDiv.innerHTML = `<h2>你的得分: ${data.total_score}</h2>`;
+                data.results.forEach(result => {
+                    resultDiv.innerHTML += `
+                        <div>
+                            <h3>${result.question}</h3>
+                            <p>正确答案: ${result.correct_answer}</p>
+                            <p>你的答案: ${result.user_answer}</p>
+                            <p>得分: ${result.score}</p>
+                        </div>
+                    `;
+                });
+            });
+        }
+    </script>
+</body>
+</html>
